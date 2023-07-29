@@ -3,13 +3,20 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
+  HttpCode,
+  HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { validate } from 'uuid';
+import { IDIsInvalidError } from './errors/id-is-invalid';
+import { UserNotFoundError } from './errors/user-not-found';
+import { ErrorMessages } from 'src/utilities/enums';
 
 @Controller('user')
 export class UserController {
@@ -27,16 +34,29 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    if (!validate(id)) throw new IDIsInvalidError();
+    const result = this.userService.findOne(id);
+
+    if (typeof result === 'boolean') throw new UserNotFoundError();
+    return result;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdatePasswordDto) {
+    if (!validate(id)) throw new IDIsInvalidError();
+
+    const result = this.userService.update(id, updateUserDto);
+    if (result === ErrorMessages.NOT_FOUND) throw new UserNotFoundError();
+    if (result === ErrorMessages.FORBIDDEN) throw new ForbiddenException();
+    return result;
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    if (!validate(id)) throw new IDIsInvalidError();
+
+    const result = this.userService.remove(id);
+    if (typeof result === 'boolean') throw new UserNotFoundError();
   }
 }
