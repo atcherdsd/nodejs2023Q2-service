@@ -15,6 +15,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --testMatch \"<rootDir>/*.spec.ts\" --config ./test/jest-e2e.json --noStackTrace --runInBand",
+    "test1": "jest --testMatch \"<rootDir>/users.e2e.spec.ts\" --config ./test/jest-e2e.json --noStackTrace --runInBand",
     "test:auth": "cross-env TEST_MODE=auth jest --config ./test/jest-e2e.json --noStackTrace --runInBand",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

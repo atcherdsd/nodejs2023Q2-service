@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import InMemoryUsersDatabase from './database/inMemoryUsersDatabase';
+import InMemoryUsersDatabase from '../database/inMemoryDatabase';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { removePassword } from './helpers/removePassword';
 

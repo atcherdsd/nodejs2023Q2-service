@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { UsersDatabase } from '../interfaces/UsersDatabase';
-import { User } from '../entities/user.entity';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import { Database } from './interfaces/Database';
+import { User } from '../user/entities/user.entity';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { v4 } from 'uuid';
-import { UpdatePasswordDto } from '../dto/update-password.dto';
-import { UserResponse } from '../entities/user-response.entity';
-import { removePassword } from '../helpers/removePassword';
+import { UpdatePasswordDto } from '../user/dto/update-password.dto';
+import { UserResponse } from '../user/entities/user-response.entity';
+import { removePassword } from '../user/helpers/removePassword';
 import { ErrorMessages } from 'src/utilities/enums';
 
 @Injectable()
-class InMemoryUsersDatabase implements UsersDatabase {
+class InMemoryUsersDatabase implements Database {
   private users: User[] = [];
 
   create(userDto: CreateUserDto): UserResponse {
