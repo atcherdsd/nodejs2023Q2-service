@@ -5,12 +5,12 @@ import { UserResponse } from '../../user/entities/user-response.entity';
 import { User } from '../../user/entities/user.entity';
 
 export interface Database {
-  create: (body: CreateUserDto) => UserResponse;
+  createUser: (body: CreateUserDto) => UserResponse;
   getUsers: () => UserResponse[];
   getUser: (id: string) => User;
   updatePassword: (
     id: string,
     body: UpdatePasswordDto,
   ) => UserResponse | ErrorMessages;
-  delete: (id: string) => void | boolean;
+  deleteUser: (id: string) => void | boolean;
 }

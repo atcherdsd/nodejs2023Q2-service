@@ -11,7 +11,7 @@ export class UserService {
   ) {}
 
   create(createUserDto: CreateUserDto) {
-    return this.database.create(createUserDto);
+    return this.database.createUser(createUserDto);
   }
 
   findAll() {
@@ -31,6 +31,6 @@ export class UserService {
   }
 
   remove(id: string) {
-    return this.database.delete(id);
+    return this.database.deleteUser(id);
   }
 }

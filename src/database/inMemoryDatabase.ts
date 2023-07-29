@@ -13,7 +13,7 @@ import { ErrorMessages } from 'src/utilities/enums';
 class InMemoryUsersDatabase implements Database {
   private users: User[] = [];
 
-  create(userDto: CreateUserDto): UserResponse {
+  createUser(userDto: CreateUserDto): UserResponse {
     const newUser = {
       ...userDto,
       id: v4(),
@@ -55,7 +55,7 @@ class InMemoryUsersDatabase implements Database {
     return user;
   }
 
-  delete(id: string) {
+  deleteUser(id: string) {
     const user = this.getUser(id);
     if (!user) return false;
     this.users = this.users.filter((user) => user.id !== id);
