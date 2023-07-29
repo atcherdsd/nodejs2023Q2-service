@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import InMemoryDatabase from 'src/database/inMemoryDatabase';
 
 @Injectable()
 export class ArtistService {
+  constructor(private database: InMemoryDatabase) {}
+
   create(createArtistDto: CreateArtistDto) {
-    return 'This action adds a new artist';
+    return this.database.createArtist(createArtistDto);
   }
 
   findAll() {
-    return `This action returns all artist`;
+    return this.database.getArtists();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} artist`;
+  findOne(id: string) {
+    return this.database.getArtist(id);
   }
 
-  update(id: number, updateArtistDto: UpdateArtistDto) {
-    return `This action updates a #${id} artist`;
+  update(id: string, updateArtistDto: UpdateArtistDto) {
+    return this.database.updateArtist(id, updateArtistDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} artist`;
+  remove(id: string) {
+    return this.database.deleteArtist(id);
   }
 }

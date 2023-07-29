@@ -1,14 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import InMemoryUsersDatabase from '../database/inMemoryDatabase';
+import InMemoryDatabase from '../database/inMemoryDatabase';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { removePassword } from './helpers/removePassword';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject('UsersDatabase') private database: InMemoryUsersDatabase,
-  ) {}
+  constructor(private database: InMemoryDatabase) {}
 
   create(createUserDto: CreateUserDto) {
     return this.database.createUser(createUserDto);
