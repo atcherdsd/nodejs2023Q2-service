@@ -17,6 +17,8 @@ import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
 import { Album } from 'src/album/entities/album.entity';
 import { UpdateAlbumDto } from 'src/album/dto/update-album.dto';
 import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
+import { Favorites } from 'src/favs/entities/fav.entity';
+import { FavoritesResponse } from 'src/favs/interfaces/FavoritesResponse';
 
 @Injectable()
 class InMemoryDatabase implements Database {
@@ -24,6 +26,11 @@ class InMemoryDatabase implements Database {
   private artists: Artist[] = [];
   private tracks: Track[] = [];
   private albums: Album[] = [];
+  private favs: Favorites = {
+    artists: [],
+    albums: [],
+    tracks: [],
+  };
 
   createUser(userDto: CreateUserDto): UserResponse {
     const newUser = {
@@ -98,6 +105,8 @@ class InMemoryDatabase implements Database {
     const artist = this.getArtist(id);
     if (!artist) return false;
 
+    this.artists = this.artists.filter((artist) => artist.id !== id);
+
     this.tracks = this.tracks.map((track) => {
       if (track.artistId === artist.id) track.artistId = null;
       return track;
@@ -106,7 +115,10 @@ class InMemoryDatabase implements Database {
       if (album.artistId === artist.id) album.artistId = null;
       return album;
     });
-    this.artists = this.artists.filter((artist) => artist.id !== id);
+    this.favs.artists = this.favs.artists.map((index) => {
+      if (index === artist.id) index = null;
+      return index;
+    });
   }
 
   createTrack(trackDto: CreateTrackDto): Track {
@@ -142,6 +154,11 @@ class InMemoryDatabase implements Database {
     const track = this.getTrack(id);
     if (!track) return false;
     this.tracks = this.tracks.filter((track) => track.id !== id);
+
+    this.favs.tracks = this.favs.tracks.map((index) => {
+      if (index === track.id) index = null;
+      return index;
+    });
   }
 
   createAlbum(albumDto: CreateAlbumDto): Album {
@@ -176,11 +193,67 @@ class InMemoryDatabase implements Database {
     const album = this.getAlbum(id);
     if (!album) return false;
 
+    this.albums = this.albums.filter((album) => album.id !== id);
+
     this.tracks = this.tracks.map((track) => {
       if (track.albumId === album.id) track.albumId = null;
       return track;
     });
-    this.albums = this.albums.filter((album) => album.id !== id);
+    this.favs.albums = this.favs.albums.map((index) => {
+      if (index === album.id) index = null;
+      return index;
+    });
+  }
+
+  getFavs(): FavoritesResponse {
+    const artists = this.artists.filter((artist) =>
+      this.favs.artists.some((el) => el === artist.id),
+    );
+    const albums = this.albums.filter((album) =>
+      this.favs.albums.some((el) => el === album.id),
+    );
+    const tracks = this.tracks.filter((track) =>
+      this.favs.tracks.some((el) => el === track.id),
+    );
+    return { artists, albums, tracks };
+  }
+  addTrackToFavs(trackId: string): void | boolean {
+    const track = this.getTrack(trackId);
+    if (!track) return false;
+
+    this.favs.tracks.push(track.id);
+  }
+  removeTrackFromFavs(id: string): void | boolean {
+    const track = this.favs.tracks.find((index) => index === id);
+    if (!track) return false;
+
+    this.favs.tracks = this.favs.tracks.filter((index) => index !== id);
+  }
+
+  addAlbumToFavs(albumId: string): void | boolean {
+    const album = this.getAlbum(albumId);
+    if (!album) return false;
+
+    this.favs.albums.push(album.id);
+  }
+  removeAlbumFromFavs(id: string): void | boolean {
+    const album = this.favs.albums.find((index) => index === id);
+    if (!album) return false;
+
+    this.favs.albums = this.favs.albums.filter((index) => index !== id);
+  }
+
+  addArtistToFavs(artistId: string): void | boolean {
+    const artist = this.getArtist(artistId);
+    if (!artist) return false;
+
+    this.favs.artists.push(artist.id);
+  }
+  removeArtistFromFavs(id: string): void | boolean {
+    const artist = this.favs.artists.find((index) => index === id);
+    if (!artist) return false;
+
+    this.favs.artists = this.favs.artists.filter((index) => index !== id);
   }
 }
 
