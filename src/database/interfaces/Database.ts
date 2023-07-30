@@ -6,6 +6,9 @@ import { User } from '../../user/entities/user.entity';
 import { CreateArtistDto } from 'src/artist/dto/create-artist.dto';
 import { Artist } from 'src/artist/entities/artist.entity';
 import { UpdateArtistDto } from 'src/artist/dto/update-artist.dto';
+import { CreateTrackDto } from 'src/track/dto/create-track.dto';
+import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
+import { Track } from 'src/track/entities/track.entity';
 
 export interface Database {
   createUser: (body: CreateUserDto) => UserResponse;
@@ -22,4 +25,10 @@ export interface Database {
   getArtist: (id: string) => Artist;
   updateArtist: (id: string, body: UpdateArtistDto) => Artist | boolean;
   deleteArtist: (id: string) => void;
+
+  createTrack: (body: CreateTrackDto) => Track;
+  getTracks: () => Track[];
+  getTrack: (id: string) => Track;
+  updateTrack: (id: string, body: UpdateTrackDto) => Track | boolean;
+  deleteTrack: (id: string) => void;
 }

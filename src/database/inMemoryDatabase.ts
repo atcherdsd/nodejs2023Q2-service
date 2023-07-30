@@ -11,11 +11,15 @@ import { ErrorMessages } from 'src/utilities/enums';
 import { Artist } from 'src/artist/entities/artist.entity';
 import { CreateArtistDto } from 'src/artist/dto/create-artist.dto';
 import { UpdateArtistDto } from 'src/artist/dto/update-artist.dto';
+import { Track } from 'src/track/entities/track.entity';
+import { CreateTrackDto } from 'src/track/dto/create-track.dto';
+import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
 
 @Injectable()
 class InMemoryDatabase implements Database {
   private users: User[] = [];
   private artists: Artist[] = [];
+  private tracks: Track[] = [];
 
   createUser(userDto: CreateUserDto): UserResponse {
     const newUser = {
@@ -90,6 +94,41 @@ class InMemoryDatabase implements Database {
     const artist = this.getArtist(id);
     if (!artist) return false;
     this.artists = this.artists.filter((artist) => artist.id !== id);
+  }
+
+  createTrack(trackDto: CreateTrackDto): Track {
+    const newTrack = { ...trackDto, id: v4() } as Track;
+    this.tracks.push(newTrack);
+    return newTrack;
+  }
+  getTracks(): Track[] {
+    return this.tracks;
+  }
+  getTrack(id: string) {
+    return this.tracks.find((track) => track.id === id);
+  }
+  updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
+    const track = this.getTrack(id);
+    if (!track) return false;
+
+    const updatedTrackDto = {
+      ...track,
+      name: updateTrackDto.name,
+      duration: updateTrackDto.duration,
+      artistId: updateTrackDto.artistId
+        ? updateTrackDto.artistId
+        : track.artistId,
+      albumId: updateTrackDto.albumId ? updateTrackDto.albumId : track.albumId,
+    } as Track;
+    this.tracks.map((track) => {
+      return track.id === id ? updatedTrackDto : track;
+    });
+    return updatedTrackDto;
+  }
+  deleteTrack(id: string) {
+    const track = this.getTrack(id);
+    if (!track) return false;
+    this.tracks = this.tracks.filter((track) => track.id !== id);
   }
 }
 
