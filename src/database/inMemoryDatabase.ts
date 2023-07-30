@@ -14,12 +14,16 @@ import { UpdateArtistDto } from 'src/artist/dto/update-artist.dto';
 import { Track } from 'src/track/entities/track.entity';
 import { CreateTrackDto } from 'src/track/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
+import { Album } from 'src/album/entities/album.entity';
+import { UpdateAlbumDto } from 'src/album/dto/update-album.dto';
+import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
 
 @Injectable()
 class InMemoryDatabase implements Database {
   private users: User[] = [];
   private artists: Artist[] = [];
   private tracks: Track[] = [];
+  private albums: Album[] = [];
 
   createUser(userDto: CreateUserDto): UserResponse {
     const newUser = {
@@ -129,6 +133,40 @@ class InMemoryDatabase implements Database {
     const track = this.getTrack(id);
     if (!track) return false;
     this.tracks = this.tracks.filter((track) => track.id !== id);
+  }
+
+  createAlbum(albumDto: CreateAlbumDto): Album {
+    const newAlbum = { ...albumDto, id: v4() } as Album;
+    this.albums.push(newAlbum);
+    return newAlbum;
+  }
+  getAlbums(): Album[] {
+    return this.albums;
+  }
+  getAlbum(id: string) {
+    return this.albums.find((album) => album.id === id);
+  }
+  updateAlbum(id: string, updateAlbumDto: UpdateAlbumDto) {
+    const album = this.getAlbum(id);
+    if (!album) return false;
+
+    const updatedAlbumDto = {
+      ...album,
+      name: updateAlbumDto.name,
+      year: updateAlbumDto.year,
+      artistId: updateAlbumDto.artistId
+        ? updateAlbumDto.artistId
+        : album.artistId,
+    } as Album;
+    this.albums.map((album) => {
+      return album.id === id ? updatedAlbumDto : album;
+    });
+    return updatedAlbumDto;
+  }
+  deleteAlbum(id: string) {
+    const album = this.getAlbum(id);
+    if (!album) return false;
+    this.albums = this.albums.filter((album) => album.id !== id);
   }
 }
 

@@ -9,6 +9,9 @@ import { UpdateArtistDto } from 'src/artist/dto/update-artist.dto';
 import { CreateTrackDto } from 'src/track/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
 import { Track } from 'src/track/entities/track.entity';
+import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
+import { UpdateAlbumDto } from 'src/album/dto/update-album.dto';
+import { Album } from 'src/album/entities/album.entity';
 
 export interface Database {
   createUser: (body: CreateUserDto) => UserResponse;
@@ -31,4 +34,10 @@ export interface Database {
   getTrack: (id: string) => Track;
   updateTrack: (id: string, body: UpdateTrackDto) => Track | boolean;
   deleteTrack: (id: string) => void;
+
+  createAlbum: (body: CreateAlbumDto) => Album;
+  getAlbums: () => Album[];
+  getAlbum: (id: string) => Album;
+  updateAlbum: (id: string, body: UpdateAlbumDto) => Album | boolean;
+  deleteAlbum: (id: string) => void;
 }
