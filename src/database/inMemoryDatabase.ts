@@ -97,6 +97,15 @@ class InMemoryDatabase implements Database {
   deleteArtist(id: string) {
     const artist = this.getArtist(id);
     if (!artist) return false;
+
+    this.tracks = this.tracks.map((track) => {
+      if (track.artistId === artist.id) track.artistId = null;
+      return track;
+    });
+    this.albums = this.albums.map((album) => {
+      if (album.artistId === artist.id) album.artistId = null;
+      return album;
+    });
     this.artists = this.artists.filter((artist) => artist.id !== id);
   }
 
@@ -166,6 +175,11 @@ class InMemoryDatabase implements Database {
   deleteAlbum(id: string) {
     const album = this.getAlbum(id);
     if (!album) return false;
+
+    this.tracks = this.tracks.map((track) => {
+      if (track.albumId === album.id) track.albumId = null;
+      return track;
+    });
     this.albums = this.albums.filter((album) => album.id !== id);
   }
 }
