@@ -16,7 +16,9 @@ export class ArtistService {
   }
 
   findOne(id: string) {
-    return this.database.getArtist(id);
+    const artist = this.database.getArtist(id);
+    if (!artist) return false;
+    return artist;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {

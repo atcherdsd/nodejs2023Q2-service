@@ -61,20 +61,25 @@ class InMemoryDatabase implements Database {
     this.users = this.users.filter((user) => user.id !== id);
   }
 
-  createArtist(artistDto: CreateArtistDto) {
-    const newArtist = { ...artistDto } as Artist;
+  createArtist(artistDto: CreateArtistDto): Artist {
+    const newArtist = { ...artistDto, id: v4() } as Artist;
     this.artists.push(newArtist);
     return newArtist;
   }
-  getArtists() {
+  getArtists(): Artist[] {
     return this.artists;
   }
   getArtist(id: string) {
     return this.artists.find((artist) => artist.id === id);
   }
   updateArtist(id: string, updateArtistDto: UpdateArtistDto) {
+    const artist = this.getArtist(id);
+    if (!artist) return false;
+
     const updatedArtistDto = {
-      ...updateArtistDto,
+      ...artist,
+      name: updateArtistDto.name,
+      grammy: updateArtistDto.grammy,
     } as Artist;
     this.artists.map((artist) => {
       return artist.id === id ? updatedArtistDto : artist;
@@ -82,7 +87,9 @@ class InMemoryDatabase implements Database {
     return updatedArtistDto;
   }
   deleteArtist(id: string) {
-    this.artists.filter((artist) => artist.id !== id);
+    const artist = this.getArtist(id);
+    if (!artist) return false;
+    this.artists = this.artists.filter((artist) => artist.id !== id);
   }
 }
 

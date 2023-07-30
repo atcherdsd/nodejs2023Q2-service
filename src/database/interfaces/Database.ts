@@ -20,6 +20,6 @@ export interface Database {
   createArtist: (body: CreateArtistDto) => Artist;
   getArtists: () => Artist[];
   getArtist: (id: string) => Artist;
-  updateArtist: (id: string, body: UpdateArtistDto) => Artist;
+  updateArtist: (id: string, body: UpdateArtistDto) => Artist | boolean;
   deleteArtist: (id: string) => void;
 }
