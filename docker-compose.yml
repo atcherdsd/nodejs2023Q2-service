@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+
+  # 1. Container with Node.js
+  app:
+    build: 
+      # Defines a path to a directory containing a Dockerfile for app
+      context: .
+    container_name: app-container
+    env_file:
+      - .env
+    ports:
+      - ${PORT}:${PORT}
+    networks:
+      - custom-network
+    volumes:
+      - ./src:/app/src
+      - node_modules:/app/node_modules
+    restart: always
+    # postgres are created before app
+    depends_on:
+      - postgres
+
+  # 2. Container with database
+  postgres:
+    # Here the image can be used instead build
+    # but conditions of the task require 2 Dockerfile:
+    build: 
+      # Defines a path to a directory containing a Dockerfile for postgres
+      context: ./database
+    container_name: postgres-container
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    networks:
+      - custom-network
+    volumes:
+      # Saving data (database files)
+      - postgres-db:/var/lib/postgresql/data
+    restart: always
+        
+networks:
+  custom-network:
+    driver: bridge
+
+volumes:
+  node_modules:
+  postgres-db:
