@@ -24,7 +24,7 @@ cd nodejs2023Q2-service
 ## Switch branch
 
 ```
-git checkout rest-basic
+git checkout rest2-docker-db
 ```
 
 ## Installing NPM modules
@@ -33,15 +33,46 @@ git checkout rest-basic
 npm install
 ```
 
-## Rename the ```.env.example``` file to ```.env```
+## Rename the `.env.example` file to `.env`
 
 ## Running application
 
 ```
-npm start
+docker-compose up -d
+```
+## Info about application
+
+After starting the app, to view information 
+about running containers, run the command in the terminal:
+
+```
+docker-compose ps
 ```
 
-After starting the app on port (4000 as default) you can open
+To view size information about the Docker application image 
+and database image, run the following command in a terminal:
+
+```
+docker-compose images
+```
+
+To stop and remove containers, run the command in the terminal:
+
+```
+docker-compose down
+```
+
+## Deploy on Docker Hub
+
+The built application images are hosted on Docker Hub:
+
+https://hub.docker.com/repository/docker/atcherdsd/nodejs2023q2-service-app/general
+
+(`latest` tag for the application and `postgres` tag for the database).
+
+## Application Documentation
+
+On port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
