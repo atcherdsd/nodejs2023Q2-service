@@ -12,6 +12,12 @@ COPY package*.json .
 # Install node modules into node_modules directory inside image
 RUN npm install
 
+COPY prisma ./prisma
+
+# Run directly because a Docker-container is used
+# Prisma Client creation
+RUN npx prisma generate
+
 # Add source code from current directory into the image
 COPY . .
 
