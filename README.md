@@ -8,7 +8,23 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone git@github.com:atcherdsd/nodejs2023Q2-service.git
+
+or 
+
+git clone https://github.com/atcherdsd/nodejs2023Q2-service.git
+```
+
+## Change directory
+
+```
+cd nodejs2023Q2-service
+```
+
+## Switch branch
+
+```
+git checkout rest-basic
 ```
 
 ## Installing NPM modules
@@ -16,6 +32,8 @@ git clone {repository URL}
 ```
 npm install
 ```
+
+## Rename the ```.env.example``` file to ```.env```
 
 ## Running application
 

@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: /api
+  - url: /
 
 components:
   schemas:
@@ -21,10 +21,10 @@ components:
         version:
           type: number
           example: 1
-        createAt:
+        createdAt:
           type: number
           example: 1655000000
-        updateAt:
+        updatedAt:
           type: number
           example: 1655000000
       required:
@@ -72,7 +72,7 @@ components:
           format: uuid
         name:
           type: string
-          example: The Show Must Go On
+          example: 'The Show Must Go On'
         artistId:
           type: string
           format: uuid
@@ -189,7 +189,7 @@ paths:
           description: Bad request
         409:
           description: Conflict. Login already exists
-  /users:
+  /user:
     get:
       tags:
         - Users
@@ -239,7 +239,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /users/{userId}:
+  /user/{userId}:
     parameters:
       - name: userId
         in: path
@@ -250,7 +250,7 @@ paths:
       tags:
         - Users
       summary: Get single user by id
-      description: Get single user by id
+      description: Gets single user by id
       responses:
         200:
           description: Successful operation
@@ -301,14 +301,14 @@ paths:
                     format: uuid
                   login:
                     type: string
-                    example: TestUser
+                    example: 'TestUser'
                   version:
                     type: integer
                     example: 2
-                  createAt:
+                  createdAt:
                     type: integer
                     example: 1655000000
-                  updateAt:
+                  updatedAt:
                     type: integer
                     example: 1655999999
         400:
@@ -334,7 +334,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: User not found
-  /tracks:
+  /track:
     get:
       tags:
         - Track
@@ -355,7 +355,7 @@ paths:
       tags:
         - Track
       summary: Add new track
-      description: Add new track information
+      description: Adds new track information
       requestBody:
         required: true
         content:
@@ -388,7 +388,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /tracks/{id}:
+  /track/{id}:
     parameters:
       - name: id
         in: path
@@ -418,7 +418,7 @@ paths:
       tags:
         - Track
       summary: Update track information
-      description: Update library track information by UUID
+      description: Updates library track information by UUID
       requestBody:
         required: true
         content:
@@ -429,7 +429,7 @@ paths:
               properties:
                 name:
                   type: string
-                  example: Bohemian Rhapsody
+                  example: 'Bohemian Rhapsody'
                 artistId:
                   type: string
                   format: uuid
@@ -459,7 +459,7 @@ paths:
                     format: uuid
                   name:
                     type: string
-                    example: Bohemian Rhapsody
+                    example: 'Bohemian Rhapsody'
                   artistId:
                     type: string
                     format: uuid
@@ -482,7 +482,7 @@ paths:
       tags:
         - Track
       summary: Delete track
-      description: Delete track from library
+      description: Deletes track from library
       responses:
         204:
           description: Deleted successfully
@@ -492,7 +492,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
-  /albums:
+  /album:
     get:
       tags:
         - Album
@@ -544,7 +544,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /albums/{id}:
+  /album/{id}:
     parameters:
       - name: id
         in: path
@@ -611,7 +611,7 @@ paths:
       tags:
         - Album
       summary: Delete album
-      description: Delete album from library
+      description: Deletes album from library
       responses:
         204:
           description: Deleted successfully
@@ -621,7 +621,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
-  /artists:
+  /artist:
     get:
       tags:
         - Artist
@@ -642,7 +642,7 @@ paths:
       tags:
         - Artist
       summary: Add new artist
-      description: Add new artist
+      description: Adds new artist
       requestBody:
         required: true
         content:
@@ -668,7 +668,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /artists/{id}:
+  /artist/{id}:
     parameters:
       - name: id
         in: path
@@ -698,7 +698,7 @@ paths:
       tags:
         - Artist
       summary: Update artist information
-      description: Update artist information by UUID
+      description: Updates artist information by UUID
       requestBody:
         required: true
         content:
@@ -730,7 +730,7 @@ paths:
       tags:
         - Artist
       summary: Delete artist
-      description: Delete artist from library
+      description: Deletes artist from library
       responses:
         204:
           description: Deleted successfully
@@ -745,7 +745,7 @@ paths:
       tags:
         - Favorites
       summary: Get all favorites
-      description: Gets all favorites movies, tracks and books
+      description: Gets all favorites artists, tracks and albums
       responses:
         200:
           description: Successful operation
@@ -767,12 +767,12 @@ paths:
       tags:
         - Favorites
       summary: Add track to the favorites
-      description: Add track to the favorites
+      description: Adds track to the favorites
       responses:
         201:
           description: Added successfully
         400:
-          description: Bad. trackId is invalid (not uuid)
+          description: Bad request. trackId is invalid (not uuid)
         401:
           $ref: '#/components/responses/UnauthorizedError'
         422:
@@ -781,12 +781,12 @@ paths:
       tags:
         - Favorites
       summary: Delete track from favorites
-      description: Delete track from favorites
+      description: Deletes track from favorites
       responses:
         204:
           description: Deleted successfully
         400:
-          description: Bad. trackId is invalid (not uuid)
+          description: Bad request. trackId is invalid (not uuid)
         401:
           $ref: '#/components/responses/UnauthorizedError'
         404:
@@ -803,12 +803,12 @@ paths:
       tags:
         - Favorites
       summary: Add album to the favorites
-      description: Add album to the favorites
+      description: Adds album to the favorites
       responses:
         201:
           description: Added successfully
         400:
-          description: Bad. albumId is invalid (not uuid)
+          description: Bad request. albumId is invalid (not uuid)
         401:
           $ref: '#/components/responses/UnauthorizedError'
         422:
@@ -817,12 +817,12 @@ paths:
       tags:
         - Favorites
       summary: Delete album from favorites
-      description: Delete album from favorites
+      description: Deletes album from favorites
       responses:
         204:
           description: Deleted successfully
         400:
-          description: Bad. albumId is invalid (not uuid)
+          description: Bad request. albumId is invalid (not uuid)
         401:
           $ref: '#/components/responses/UnauthorizedError'
         404:
@@ -839,7 +839,7 @@ paths:
       tags:
         - Favorites
       summary: Add artist to the favorites
-      description: Add artist to the favorites
+      description: Adds artist to the favorites
       responses:
         201:
           description: Added successfully
@@ -853,7 +853,7 @@ paths:
       tags:
         - Favorites
       summary: Delete artist from favorites
-      description: Delete artist from favorites
+      description: Deletes artist from favorites
       responses:
         204:
           description: Deleted successfully
