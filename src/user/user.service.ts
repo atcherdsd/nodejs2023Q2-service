@@ -1,34 +1,65 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import InMemoryDatabase from '../database/inMemoryDatabase';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { removePassword } from './helpers/removePassword';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UserResponse } from './entities/user-response.entity';
+import { transformData } from './helpers/transformData';
+import { IUser } from './interfaces/interfaces';
+import { ErrorMessages } from 'src/utilities/enums';
 
 @Injectable()
 export class UserService {
-  constructor(private database: InMemoryDatabase) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.database.createUser(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<UserResponse> {
+    const newUser: IUser = await this.prisma.user.create({
+      data: createUserDto,
+    });
+    const responseData = transformData(newUser) as UserResponse;
+    return responseData;
   }
 
-  findAll() {
-    return this.database.getUsers();
+  async findAll(): Promise<UserResponse[]> {
+    const users = await this.prisma.user.findMany();
+    return users.map((user) => transformData(user)) as UserResponse[];
   }
 
-  findOne(id: string) {
-    const user = this.database.getUser(id);
+  async findOne(id: string): Promise<UserResponse | boolean> {
+    const user: IUser = await this.prisma.user.findUnique({ where: { id } });
     if (!user) return false;
-    return removePassword(user);
+    const responseData = transformData(user) as UserResponse;
+    return responseData;
   }
 
-  update(id: string, updateUserDto: UpdatePasswordDto) {
-    const result = this.database.updatePassword(id, updateUserDto);
-    if (typeof result !== 'string') return removePassword(result);
-    return result;
+  async update(
+    id: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<UserResponse | ErrorMessages> {
+    const user: IUser = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) return ErrorMessages.NOT_FOUND;
+    if (user.password !== updatePasswordDto.oldPassword)
+      return ErrorMessages.FORBIDDEN;
+
+    if (user.password !== updatePasswordDto.newPassword) {
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: {
+          password: updatePasswordDto.newPassword,
+          version: {
+            increment: 1,
+          },
+        },
+      });
+      const responseData = transformData(updatedUser) as UserResponse;
+      return responseData;
+    }
   }
 
-  remove(id: string) {
-    return this.database.deleteUser(id);
+  async remove(id: string): Promise<void | boolean> {
+    try {
+      await this.prisma.user.delete({ where: { id } });
+    } catch {
+      return false;
+    }
   }
 }

@@ -31,29 +31,32 @@ export class AlbumController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     if (!validate(id)) throw new AlbumIDError();
-    const result = this.albumService.findOne(id);
+    const result = await this.albumService.findOne(id);
 
     if (typeof result === 'boolean') throw new AlbumNotFoundError();
     return result;
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateAlbumDto: UpdateAlbumDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateAlbumDto: UpdateAlbumDto,
+  ) {
     if (!validate(id)) throw new AlbumIDError();
 
-    const result = this.albumService.update(id, updateAlbumDto);
+    const result = await this.albumService.update(id, updateAlbumDto);
     if (typeof result === 'boolean') throw new AlbumNotFoundError();
     return result;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     if (!validate(id)) throw new AlbumIDError();
 
-    const result = this.albumService.remove(id);
+    const result = await this.albumService.remove(id);
     if (typeof result === 'boolean') throw new AlbumNotFoundError();
   }
 }

@@ -12,7 +12,7 @@ COPY package*.json .
 # Install node modules into node_modules directory inside image
 RUN npm install
 
-COPY prisma ./prisma
+COPY prisma ./prisma/
 
 # Run directly because a Docker-container is used
 # Prisma Client creation
@@ -24,4 +24,4 @@ COPY . .
 EXPOSE ${PORT}
 
 # Command to run when image is run inside of a container
-CMD [ "npm", "run", "start:dev" ]
+CMD [ "npm", "run", "migrate:start:dev" ]

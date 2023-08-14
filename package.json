@@ -20,7 +20,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "scan:app": "docker scan nodejs2023q2-service-app",
-    "scan:db": "docker scan nodejs2023q2-service-postgres"
+    "scan:db": "docker scan nodejs2023q2-service-postgres",
+    "migrate:start:dev": "npx prisma migrate deploy && npm run start:dev"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
