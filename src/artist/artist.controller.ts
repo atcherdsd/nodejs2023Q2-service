@@ -31,29 +31,32 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     if (!validate(id)) throw new ArtistIDError();
-    const result = this.artistService.findOne(id);
+    const result = await this.artistService.findOne(id);
 
     if (typeof result === 'boolean') throw new ArtistNotFoundError();
     return result;
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
     if (!validate(id)) throw new ArtistIDError();
 
-    const result = this.artistService.update(id, updateArtistDto);
+    const result = await this.artistService.update(id, updateArtistDto);
     if (typeof result === 'boolean') throw new ArtistNotFoundError();
     return result;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     if (!validate(id)) throw new ArtistIDError();
 
-    const result = this.artistService.remove(id);
+    const result = await this.artistService.remove(id);
     if (typeof result === 'boolean') throw new ArtistNotFoundError();
   }
 }

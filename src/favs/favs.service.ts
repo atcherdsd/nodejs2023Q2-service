@@ -1,32 +1,60 @@
 import { Injectable } from '@nestjs/common';
-import InMemoryDatabase from 'src/database/inMemoryDatabase';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { FavoritesPrismaResponse } from './interfaces/FavoritesPrismaResponse';
 
 @Injectable()
 export class FavsService {
-  constructor(private database: InMemoryDatabase) {}
+  constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.database.getFavs();
+  async findAll(): Promise<FavoritesPrismaResponse> {
+    const [favs] = await this.prisma.favorites.findMany({
+      select: {
+        artists: {
+          select: { id: true, name: true, grammy: true },
+        },
+        albums: {
+          select: { id: true, name: true, year: true, artistId: true },
+        },
+        tracks: {
+          select: {
+            id: true,
+            name: true,
+            artistId: true,
+            albumId: true,
+            duration: true,
+          },
+        },
+      },
+    });
+    return favs ? favs : { albums: [], artists: [], tracks: [] };
   }
 
-  addTrackToFavs(id: string) {
-    return this.database.addTrackToFavs(id);
-  }
-  removeTrackFromFavs(id: string) {
-    return this.database.removeTrackFromFavs(id);
-  }
+  async addToFavs(id: string, modelType: string): Promise<void | boolean> {
+    const entity = await this.prisma[modelType].findUnique({ where: { id } });
+    if (!entity) return false;
 
-  addAlbumToFavs(id: string) {
-    return this.database.addAlbumToFavs(id);
+    const favsIds = await this.prisma.favorites.findMany();
+    if (!favsIds.length) {
+      const initialFavs = await this.prisma.favorites.create({ data: {} });
+      await this.prisma[modelType].update({
+        where: { id },
+        data: { favoritesId: initialFavs.id },
+      });
+    } else {
+      await this.prisma[modelType].update({
+        where: { id },
+        data: { favoritesId: favsIds[0].id },
+      });
+    }
   }
-  removeAlbumFromFavs(id: string) {
-    return this.database.removeAlbumFromFavs(id);
-  }
-
-  addArtistToFavs(id: string) {
-    return this.database.addArtistToFavs(id);
-  }
-  removeArtistFromFavs(id: string) {
-    return this.database.removeArtistFromFavs(id);
+  async removeFromFavs(id: string, modelType: string): Promise<void | boolean> {
+    try {
+      await this.prisma[modelType].update({
+        where: { id },
+        data: { favoritesId: { set: null } },
+      });
+    } catch {
+      return false;
+    }
   }
 }

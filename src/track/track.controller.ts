@@ -31,29 +31,32 @@ export class TrackController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     if (!validate(id)) throw new TrackIDError();
-    const result = this.trackService.findOne(id);
+    const result = await this.trackService.findOne(id);
 
     if (typeof result === 'boolean') throw new TrackNotFoundError();
     return result;
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
     if (!validate(id)) throw new TrackIDError();
 
-    const result = this.trackService.update(id, updateTrackDto);
+    const result = await this.trackService.update(id, updateTrackDto);
     if (typeof result === 'boolean') throw new TrackNotFoundError();
     return result;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     if (!validate(id)) throw new TrackIDError();
 
-    const result = this.trackService.remove(id);
+    const result = await this.trackService.remove(id);
     if (typeof result === 'boolean') throw new TrackNotFoundError();
   }
 }

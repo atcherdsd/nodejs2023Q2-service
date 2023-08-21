@@ -1,31 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import InMemoryDatabase from 'src/database/inMemoryDatabase';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Album } from './entities/album.entity';
 
 @Injectable()
 export class AlbumService {
-  constructor(private database: InMemoryDatabase) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createAlbumDto: CreateAlbumDto) {
-    return this.database.createAlbum(createAlbumDto);
+  async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
+    return await this.prisma.album.create({ data: createAlbumDto });
   }
 
-  findAll() {
-    return this.database.getAlbums();
+  async findAll(): Promise<Album[]> {
+    return await this.prisma.album.findMany();
   }
 
-  findOne(id: string) {
-    const album = this.database.getAlbum(id);
+  async findOne(id: string): Promise<Album | boolean> {
+    const album = await this.prisma.album.findUnique({ where: { id } });
     if (!album) return false;
     return album;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    return this.database.updateAlbum(id, updateAlbumDto);
+  async update(
+    id: string,
+    updateAlbumDto: UpdateAlbumDto,
+  ): Promise<Album | boolean> {
+    try {
+      return await this.prisma.album.update({
+        where: { id },
+        data: updateAlbumDto,
+      });
+    } catch {
+      return false;
+    }
   }
 
-  remove(id: string) {
-    return this.database.deleteAlbum(id);
+  async remove(id: string): Promise<void | boolean> {
+    const album = await this.findOne(id);
+    if (!album) return false;
+    await this.prisma.album.delete({ where: { id } });
   }
 }

@@ -15,6 +15,7 @@ import { TrackNotExistError } from './errors/track-not-exist';
 import { TrackNotFoundError } from 'src/track/errors/track-not-found';
 import { AlbumNotFoundError } from 'src/album/errors/album-not-found';
 import { ArtistNotFoundError } from 'src/artist/errors/artist-not-found';
+import { ModelTypes } from 'src/utilities/enums';
 
 @Controller('favs')
 export class FavsController {
@@ -26,38 +27,38 @@ export class FavsController {
   }
 
   @Post('track/:id')
-  createTrackForFavs(@Param('id', ParseUUIDPipe) id: string) {
-    const result = this.favsService.addTrackToFavs(id);
+  async createTrackForFavs(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.favsService.addToFavs(id, ModelTypes.Track);
     if (typeof result === 'boolean') throw new TrackNotExistError();
   }
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeTrackFromFavs(@Param('id', ParseUUIDPipe) id: string) {
-    const result = this.favsService.removeTrackFromFavs(id);
+  async removeTrackFromFavs(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.favsService.removeFromFavs(id, ModelTypes.Track);
     if (typeof result === 'boolean') throw new TrackNotFoundError();
   }
 
   @Post('album/:id')
-  createAlbumForFavs(@Param('id', ParseUUIDPipe) id: string) {
-    const result = this.favsService.addAlbumToFavs(id);
+  async createAlbumForFavs(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.favsService.addToFavs(id, ModelTypes.Album);
     if (typeof result === 'boolean') throw new AlbumNotExistError();
   }
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string) {
-    const result = this.favsService.removeAlbumFromFavs(id);
+  async removeAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.favsService.removeFromFavs(id, ModelTypes.Album);
     if (typeof result === 'boolean') throw new AlbumNotFoundError();
   }
 
   @Post('artist/:id')
-  createArtistForFavs(@Param('id', ParseUUIDPipe) id: string) {
-    const result = this.favsService.addArtistToFavs(id);
+  async createArtistForFavs(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.favsService.addToFavs(id, ModelTypes.Artist);
     if (typeof result === 'boolean') throw new ArtistNotExistError();
   }
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeArtistFromFavs(@Param('id', ParseUUIDPipe) id: string) {
-    const result = this.favsService.removeArtistFromFavs(id);
+  async removeArtistFromFavs(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.favsService.removeFromFavs(id, ModelTypes.Artist);
     if (typeof result === 'boolean') throw new ArtistNotFoundError();
   }
 }

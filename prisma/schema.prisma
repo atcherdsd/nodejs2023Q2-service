@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  login     String
+  password  String
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Artist {
+  id          String     @id @default(uuid())
+  name        String
+  grammy      Boolean    @default(false)
+
+  favorites   Favorites? @relation(fields: [favoritesId], references: [id], onDelete: SetNull)
+  favoritesId String?
+  albums      Album[]
+  tracks      Track[]
+
+  @@map("artists") // using @@map here and below is optional
+}
+
+model Track {
+  id          String     @id @default(uuid())
+  name        String     @db.VarChar(255)
+  artistId    String?    @unique
+  albumId     String?    @unique
+  duration    Int
+
+  favorites   Favorites? @relation(fields: [favoritesId], references: [id], onDelete: SetNull)
+  favoritesId String?
+  artist      Artist?    @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  album       Album?     @relation(fields: [albumId], references: [id], onDelete: SetNull)
+
+  @@map("tracks")
+}
+
+model Album {
+  id          String     @id @default(uuid())
+  name        String     @db.VarChar(255)
+  year        Int
+  artistId    String?    @unique
+
+  favorites   Favorites? @relation(fields: [favoritesId], references: [id], onDelete: SetNull)
+  favoritesId String?
+  artist      Artist?    @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  tracks      Track[]
+
+  @@map("albums")
+}
+
+model Favorites {
+  id      String   @id @default(uuid())
+  artists Artist[]
+  albums  Album[]
+  tracks  Track[]
+
+  @@map("favorites")
+}
