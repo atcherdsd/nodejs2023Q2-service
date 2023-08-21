@@ -7,6 +7,8 @@ import { TrackModule } from './track/track.module';
 import { AlbumModule } from './album/album.module';
 import { FavsModule } from './favs/favs.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -16,6 +18,11 @@ import { PrismaModule } from './prisma/prisma.module';
     AlbumModule,
     FavsModule,
     PrismaModule,
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
