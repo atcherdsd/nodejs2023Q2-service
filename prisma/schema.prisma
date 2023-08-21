@@ -11,18 +11,19 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  login     String
-  password  String
-  version   Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  login        String
+  password     String
+  version      Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  refreshToken String?
 }
 
 model Artist {
-  id          String     @id @default(uuid())
-  name        String
-  grammy      Boolean    @default(false)
+  id     String  @id @default(uuid())
+  name   String
+  grammy Boolean @default(false)
 
   favorites   Favorites? @relation(fields: [favoritesId], references: [id], onDelete: SetNull)
   favoritesId String?
@@ -33,11 +34,11 @@ model Artist {
 }
 
 model Track {
-  id          String     @id @default(uuid())
-  name        String     @db.VarChar(255)
-  artistId    String?    @unique
-  albumId     String?    @unique
-  duration    Int
+  id       String  @id @default(uuid())
+  name     String  @db.VarChar(255)
+  artistId String? @unique
+  albumId  String? @unique
+  duration Int
 
   favorites   Favorites? @relation(fields: [favoritesId], references: [id], onDelete: SetNull)
   favoritesId String?
@@ -48,10 +49,10 @@ model Track {
 }
 
 model Album {
-  id          String     @id @default(uuid())
-  name        String     @db.VarChar(255)
-  year        Int
-  artistId    String?    @unique
+  id       String  @id @default(uuid())
+  name     String  @db.VarChar(255)
+  year     Int
+  artistId String? @unique
 
   favorites   Favorites? @relation(fields: [favoritesId], references: [id], onDelete: SetNull)
   favoritesId String?

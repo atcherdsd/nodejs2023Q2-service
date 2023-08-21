@@ -4,4 +4,5 @@ export class UserResponse {
   version: number;
   createdAt: number;
   updatedAt: number;
+  refreshToken: string;
 }

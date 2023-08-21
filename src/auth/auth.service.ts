@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -7,7 +11,7 @@ import { UserService } from 'src/user/user.service';
 import { UserResponse } from 'src/user/entities/user-response.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtData } from 'src/utilities/enums';
-import { Tokens } from './interfaces/tokens';
+import { Tokens } from './interfaces/Tokens';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
@@ -54,6 +58,15 @@ export class AuthService {
     };
   }
 
+  private async updateUserRefreshToken(userId: string, refreshToken: string) {
+    const hashedRefreshToken = await this.hashData(refreshToken);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: hashedRefreshToken },
+    });
+  }
+
   async signup(createAuthDto: CreateUserDto): Promise<UserResponse | boolean> {
     const alreadyExistingUser = await this.getUser(createAuthDto);
     if (alreadyExistingUser) {
@@ -67,7 +80,7 @@ export class AuthService {
     return newAddedUser;
   }
 
-  async login(createAuthDto: CreateUserDto) {
+  async login(createAuthDto: CreateUserDto): Promise<Tokens | boolean> {
     const existingUser = await this.getUser(createAuthDto);
     const isPasswordsMatch = await bcrypt.compare(
       createAuthDto.password,
@@ -82,10 +95,40 @@ export class AuthService {
       existingUser.login,
     );
 
+    await this.updateUserRefreshToken(existingUser.id, tokens.refreshToken);
     return tokens;
   }
 
-  refreshToken(refreshTokenDto: RefreshTokenDto) {
-    return refreshTokenDto;
+  async refreshToken(refreshTokenDto: RefreshTokenDto) {
+    try {
+      const { refreshToken } = refreshTokenDto;
+      const { sub } = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get(
+          JwtData.JWT_SECRET_REFRESH_KEY,
+        ) as string,
+      });
+      if (!sub)
+        throw new UnauthorizedException('No valid refresh token provided');
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: sub },
+      });
+      if (!user || !user.refreshToken)
+        throw new ForbiddenException('Forbidden for this user');
+
+      const isRefreshTokensMatch = await bcrypt.compare(
+        user.refreshToken,
+        refreshToken,
+      );
+      if (!isRefreshTokensMatch)
+        throw new ForbiddenException('Access right not confirmed');
+
+      const tokens: Tokens = await this.getTokens(user.id, user.login);
+
+      await this.updateUserRefreshToken(user.id, tokens.refreshToken);
+      return tokens;
+    } catch (err) {
+      throw new ForbiddenException('Access denied');
+    }
   }
 }
