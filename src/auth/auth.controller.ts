@@ -6,13 +6,14 @@ import {
   HttpStatus,
   ValidationPipe,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PublicRoute } from './decorators/public.decorator';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { SignupError } from './errors/signup-error';
 import { LoginError } from './errors/login-error';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
 
 @PublicRoute()
 @Controller('auth')
@@ -21,11 +22,8 @@ export class AuthController {
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
-  async signup(@Body() createAuthDto: CreateUserDto) {
-    const result = await this.authService.signup(createAuthDto);
-
-    if (typeof result === 'boolean') throw new SignupError();
-    return result;
+  signup(@Body() createAuthDto: CreateUserDto) {
+    return this.authService.signup(createAuthDto);
   }
 
   @Post('login')
@@ -37,6 +35,7 @@ export class AuthController {
     return result;
   }
 
+  @UseGuards(RefreshTokenGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   refreshToken(

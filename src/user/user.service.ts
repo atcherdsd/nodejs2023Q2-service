@@ -5,15 +5,29 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponse } from './entities/user-response.entity';
 import { transformData } from './helpers/transformData';
 import { IUser } from './interfaces/interfaces';
-import { ErrorMessages } from 'src/utilities/enums';
+import { ErrorMessages, JwtData } from 'src/utilities/enums';
+import bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private configService: ConfigService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
+    const saltRounds = +this.configService.get(JwtData.CRYPT_SALT);
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      saltRounds,
+    );
     const newUser: IUser = await this.prisma.user.create({
-      data: createUserDto,
+      data: {
+        ...createUserDto,
+        password: hashedPassword,
+        refreshToken: '',
+      },
     });
     const responseData = transformData(newUser) as UserResponse;
     return responseData;
@@ -41,10 +55,15 @@ export class UserService {
       return ErrorMessages.FORBIDDEN;
 
     if (user.password !== updatePasswordDto.newPassword) {
+      const saltRounds = +this.configService.get(JwtData.CRYPT_SALT);
+      const updatedPassword = await bcrypt.hash(
+        updatePasswordDto.newPassword,
+        saltRounds,
+      );
       const updatedUser = await this.prisma.user.update({
         where: { id },
         data: {
-          password: updatePasswordDto.newPassword,
+          password: updatedPassword,
           version: {
             increment: 1,
           },

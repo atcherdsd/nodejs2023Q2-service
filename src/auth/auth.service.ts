@@ -67,11 +67,7 @@ export class AuthService {
     });
   }
 
-  async signup(createAuthDto: CreateUserDto): Promise<UserResponse | boolean> {
-    const alreadyExistingUser = await this.getUser(createAuthDto);
-    if (alreadyExistingUser) {
-      return false;
-    }
+  async signup(createAuthDto: CreateUserDto): Promise<UserResponse> {
     const hashedPassword = await this.hashData(createAuthDto.password);
     const newAddedUser: UserResponse = await this.userService.create({
       ...createAuthDto,
@@ -113,8 +109,7 @@ export class AuthService {
       const user = await this.prisma.user.findUnique({
         where: { id: sub },
       });
-      if (!user || !user.refreshToken)
-        throw new ForbiddenException('Forbidden for this user');
+      if (!user) throw new ForbiddenException('Forbidden for this user');
 
       const isRefreshTokensMatch = await bcrypt.compare(
         user.refreshToken,
