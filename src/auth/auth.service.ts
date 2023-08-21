@@ -11,7 +11,7 @@ import { UserService } from 'src/user/user.service';
 import { UserResponse } from 'src/user/entities/user-response.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtData } from 'src/utilities/enums';
-import { Tokens } from './interfaces/Tokens';
+import { PayloadToken, Tokens } from './interfaces/Tokens';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
@@ -36,7 +36,7 @@ export class AuthService {
   }
 
   private async getTokens(userId: string, login: string) {
-    const payload = { sub: userId, login: login };
+    const payload: PayloadToken = { sub: userId, login: login };
     const jwtAccessTokenOptions = {
       secret: this.configService.get(JwtData.JWT_SECRET_KEY),
       expiresIn: this.configService.get(JwtData.TOKEN_EXPIRE_TIME),
