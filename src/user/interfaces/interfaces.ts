@@ -5,4 +5,5 @@ export interface IUser {
   version: number;
   createdAt: Date;
   updatedAt: Date;
+  refreshToken: string;
 }
